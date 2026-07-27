@@ -1,0 +1,13 @@
+services:
+  bot:
+    build: .
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: sqlite+aiosqlite:///data/movielib.db
+    volumes:
+      - movielib-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  movielib-data:

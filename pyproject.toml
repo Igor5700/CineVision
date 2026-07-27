@@ -1,0 +1,66 @@
+[project]
+name = "movielib"
+version = "0.1.0"
+description = "Movie library management platform — Telegram is one client on a client-agnostic core"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+dependencies = [
+    "aiogram>=3.25,<4",
+    "sqlalchemy[asyncio]>=2.0,<3",
+    "aiosqlite>=0.22",
+    "alembic>=1.13",
+    # Capped at <3.14: aiohttp 3.14 made `stream_writer` a required kwarg on
+    # ClientResponse.__init__, which aioresponses (0.7.9, latest) doesn't pass —
+    # every mocked-HTTP test dies with a TypeError. Lift the cap once
+    # aioresponses supports aiohttp 3.14.
+    "aiohttp>=3.13,<3.14",
+    "pydantic>=2.12",
+    "pydantic-settings>=2.6",
+    "python-dotenv>=1.0",
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.32",
+    "pillow>=11.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=0.24",
+    "pytest-cov>=6.0",
+    "aioresponses>=0.7",
+    "httpx>=0.27",
+    "ruff>=0.8",
+    "mypy>=1.13",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/movielib"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "N", "SIM"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's DI relies on `Depends(...)`/`Query(...)`/etc. as argument
+# defaults — that's the framework's intended pattern, not the mutable-
+# default-argument footgun B008 otherwise (correctly) warns about.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Path"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+mypy_path = "src"
+explicit_package_bases = true

@@ -1,0 +1,23 @@
+from __future__ import annotations
+
+from typing import Protocol
+
+from movielib.domain.entities.collection import Collection
+from movielib.domain.entities.film import Film
+from movielib.domain.value_objects.telegram_id import TelegramId
+
+
+class CollectionRepository(Protocol):
+    async def create(self, collection: Collection) -> Collection: ...
+
+    async def get(self, collection_id: int) -> Collection | None: ...
+
+    async def list_for_user(self, telegram_id: TelegramId) -> list[Collection]: ...
+
+    async def delete(self, collection_id: int) -> None: ...
+
+    async def add_film(self, collection_id: int, film_id: int) -> None: ...
+
+    async def remove_film(self, collection_id: int, film_id: int) -> None: ...
+
+    async def list_films(self, collection_id: int) -> list[Film]: ...
